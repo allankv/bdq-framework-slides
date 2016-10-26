@@ -165,25 +165,113 @@
 				</section>	
 				<section data-menu-title="1. Use Case">
 					<h3>1. Select a Use Case</h3>
+					<p>
+						Use cases: 
+						<select id="selected_use_case" style="height: 30px">						  
+						  <option value=""></option>					  
+						</select>
+					</p>
+					<blockquote id="selected_use_case_description">						
+					</blockquote>
 				</section>	
 				<section data-menu-title="2. Valuable Information Elements">
 					<h3>2. Select a set of valuable Information Elements (IE)</h3>
+					<p>
+						IE: 
+						<select id="selected_ie" style="height: 30px">						  
+						  <option value=""></option>					  
+						</select>
+						<button id="ie_add">Add</button>
+					</p>
+					<blockquote id="selected_ie_description">						
+					</blockquote>
+					<ul id="itens_ie">					  
+					</ul>
 				</section>	
 				<section data-menu-title="3. Contextualized Dimensions">
 					<h3>3. Select a set of Contextualized Dimensions</h3>
+					<div id="dimension_content"></div>
 				</section>	
 				<section data-menu-title="4. Contextualized Criteria">
 					<h3>4. Select a set of Contextualized Criteria</h3>
+					<div id="criterion_content"></div>
 				</section>	
 				<section data-menu-title="5. Contextualized Enhancements">
 					<h3>5. Select a set of Contextualized Enhancements</h3>
+					<div id="enhancement_content"></div>
 				</section>	
 
 			</div>
 		</div>
 		<script src="lib/js/head.min.js"></script>
+		<script src="js/jquery-3.1.1.min.js"></script>
+		
 		<script src="js/reveal.js"></script>
 		<script>
+			var ConceptualFramework = function() {
+				this.contextulized = {};
+				this.selected = {};
+				this.available = {};
+				this.profile = {};
+
+			}
+			ConceptualFramework.prototype.setup = function(concept,selectorId,selectorIdDescription, addButton,itens) {									
+				var self = this;
+				self.selected[concept] = self.selected[concept]?self.selected[concept]:{};
+				self.selected[concept].selectorId = selectorId;
+				self.selected[concept].selectorIdDescription = selectorIdDescription;				
+				$("#"+self.selected[concept].selectorId).change(function() {
+					$("#"+selectorIdDescription).html(self.available[concept][$("#"+self.selected[concept].selectorId).val()].description);
+					if(!addButton){
+						self.profile[concept] = self.available[concept][$("#"+self.selected[concept].selectorId).val()];
+					}
+				});
+				if(addButton){
+					$("#"+addButton).click(function() {
+						self.profile[concept] = self.profile[concept]?self.profile[concept]:[];
+						self.profile[concept].push(self.available[concept][$("#"+self.selected[concept].selectorId).val()]);
+						$("#"+itens).append('<li>'+self.available[concept][$("#"+self.selected[concept].selectorId).val()].value+'</li>');
+						self.updateContextualized();
+					});
+				}			
+			}	
+			ConceptualFramework.prototype.updateContextualized = function() {
+				var self = this;
+				Object.keys(self.contextulized).forEach(function(key) {
+					$("#"+self.contextulized[key].selectorId).html('');
+					Object.keys(self.profile.ie).forEach(function(keyIE) {
+						$("#"+self.contextulized[key].selectorId).append('<p>'+self.profile.ie[keyIE].value+':</p>');
+					});
+				});				
+			}			
+			ConceptualFramework.prototype.setupContextualized = function(concept,selectorId) {									
+				var self = this;
+				self.contextulized[concept] = self.contextulized[concept]?self.contextulized[concept]:{};
+				self.contextulized[concept].selectorId = selectorId;				
+			}			
+			ConceptualFramework.prototype.addAvailableConcept = function(concept,id, value, description) {
+				var	self = this;
+				self.available[concept] = self.available[concept]?self.available[concept]:{};				
+				self.available[concept][id] = {value:value,description:description};				
+				$("#"+self.selected[concept].selectorId).append('<option value="'+id+'">'+self.available[concept][id].value+'</option>');				
+			}			
+			var framework = new ConceptualFramework();			
+			framework.setup("useCase","selected_use_case","selected_use_case_description");						
+			framework.addAvailableConcept("useCase","sdm","Species Distribution Modelling", "Species distribution modeling uses, encopassing niche modeling and ...");
+			framework.addAvailableConcept("useCase","sc","Brazillian National Checklist of Species", "Official species checklist of Brazil");
+
+			framework.setup("ie","selected_ie","selected_ie_description","ie_add","itens_ie");
+			framework.addAvailableConcept("ie","coord","Coordinates", "Decimal Latitude, Decimal Longitude, Geodetic Datum and Coordinates Uncertainty in Meters");
+			framework.addAvailableConcept("ie","sciName","Scientific Name", "Complete scientific name");
+			framework.addAvailableConcept("ie","date","Event Date", "Date and time whether event occur");
+			framework.addAvailableConcept("ie","country","Country", "Country name and country code where the event occur");
+
+			framework.setupContextualized("dimension","dimension_content");
+			framework.setupContextualized("criterion","criterion_content");
+			framework.setupContextualized("enhancement","enhancement_content");
+
+
+
 			// More info https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
 				menu: {
