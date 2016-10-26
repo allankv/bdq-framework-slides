@@ -1,0 +1,37 @@
+{
+  "name": "bdd",
+  "version": "1.0.0",
+  "main": "server/server.js",
+  "scripts": {
+    "pretest": "jshint ."
+  },
+  "dependencies": {
+    "async": "^1.5.2",
+    "compression": "^1.0.3",
+    "cors": "^2.5.2",
+    "googleapis": "^12.4.0",
+    "http-request": "^0.7.0",
+    "loopback": "^2.22.0",
+    "loopback-boot": "^2.6.5",
+    "loopback-component-explorer": "^2.1.0",
+    "loopback-component-storage": "^1.8.1",
+    "loopback-connector-mongodb": "^1.13.1",
+    "loopback-datasource-juggler": "^2.39.0",
+    "mustache": "^2.2.1",
+    "node-xlsx": "^0.6.0",
+    "object-hash": "^0.9.5",
+    "quickthumb": "0.0.12",
+    "requestretry": "^1.6.0",
+    "serve-favicon": "^2.0.1",
+    "underscore": "^1.8.3",
+    "validator": "^4.4.0"
+  },
+  "devDependencies": {
+    "jshint": "^2.5.6"
+  },
+  "repository": {
+    "type": "",
+    "url": ""
+  },
+  "description": "bdd"
+}
