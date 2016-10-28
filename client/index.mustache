@@ -85,7 +85,7 @@
 				<!-- MAIN COMPONENTS -->
 				<section>
 					<section data-menu-title="Framework components">
-						<h2>FRAMEWORK Components:</h2>					
+						<h2>FRAMEWORK COMPONENTS:</h2>					
 						<h3>1. DQ NEEDS</h3>					
 						<p>
 							Define the <strong>meaning of DQ in a given context</strong> according to data users perspectives.
@@ -106,7 +106,7 @@
 
 				<!-- DQ NEEDS -->				
 				<section data-menu-title="DQ Needs components">
-					<h3>1. DQ NEEDS Components:</h3>											
+					<h3>1. DQ NEEDS COMPONENTS:</h3>											
 					<p>
 						<strong>1. USE CASE:</strong><br> A data use <b>CONTEXT</b>.
 					</p>	
@@ -125,7 +125,7 @@
 				</section>	
 				<!-- DQ SOLUTIONS -->				
 				<section data-menu-title="DQ Solutions components">
-					<h3>2. DQ SOLUTIONS Components:</h3>											
+					<h3>2. DQ SOLUTIONS COMPONENTS:</h3>											
 					<p>
 						<strong>1. DQ MEASUREMENT METHOD:</strong><br> A manner of procedure, especially an orderly, logical, or systematic way of instruction for <b>DQ MEASUREMENT</b>.
 					</p>	
@@ -141,7 +141,7 @@
 				</section>					
 				<!-- DQ REPORT -->				
 				<section data-menu-title="DQ Reports components">
-					<h3>3. DQ REPORTS Components:</h3>											
+					<h3>3. DQ REPORTS COMPONENTS:</h3>											
 					<p>
 						<strong>1. DATA RESOURCE:</strong><br> A <b>SINGLE RECORD</b> or <b>DATASET</b>.
 					</p>	
@@ -188,18 +188,20 @@
 					<ul id="itens_ie">					  
 					</ul>
 				</section>	
-				<section data-menu-title="3. Contextualized Dimensions">
-					<h3>3. Select a set of Contextualized Dimensions</h3>
-					<div id="dimension_content"></div>
-				</section>	
-				<section data-menu-title="4. Contextualized Criteria">
+				<section id="dimension_content">					
+				</section>
+				<section id="criterion_content">					
+				</section>
+				<section id="enhancement_content">					
+				</section>
+				<!-- <section data-menu-title="4. Contextualized Criteria">
 					<h3>4. Select a set of Contextualized Criteria</h3>
 					<div id="criterion_content"></div>
-				</section>	
+				</section>
 				<section data-menu-title="5. Contextualized Enhancements">
 					<h3>5. Select a set of Contextualized Enhancements</h3>
 					<div id="enhancement_content"></div>
-				</section>	
+				</section>	 -->
 
 			</div>
 		</div>
@@ -212,10 +214,9 @@
 				this.contextulized = {};
 				this.selected = {};
 				this.available = {};
-				this.profile = {};
-
+				this.profile = {};				
 			}
-			ConceptualFramework.prototype.setup = function(concept,selectorId,selectorIdDescription, addButton,itens) {									
+			ConceptualFramework.prototype.setup = function(concept,selectorId,selectorIdDescription, addButton,itens) {							
 				var self = this;
 				self.selected[concept] = self.selected[concept]?self.selected[concept]:{};
 				self.selected[concept].selectorId = selectorId;
@@ -240,35 +241,57 @@
 				Object.keys(self.contextulized).forEach(function(key) {
 					$("#"+self.contextulized[key].selectorId).html('');
 					Object.keys(self.profile.ie).forEach(function(keyIE) {
-						$("#"+self.contextulized[key].selectorId).append('<p>'+self.profile.ie[keyIE].value+':</p>');
+						var content = $(`<section>
+										<h3>3. Define a set of important `+self.contextulized[key].title+` for `+self.profile.ie[keyIE].value+`</h3>	
+										<div id="content_`+key+`"/>
+										</section>`);
+						var dimensionsContent = $('<select></select>');
+						Object.keys(self.available[concept]).forEach(function(id) {
+							dimensionsContent.append('<option value="'+id+'">'+self.available[concept][id].value+'</option>');	
+						});
+						content.find("#content_"+key).append(self.contextulized[key].title+': ').append(dimensionsContent);		
+						$("#"+self.contextulized[key].selectorId).append(content);
 					});
 				});				
 			}			
-			ConceptualFramework.prototype.setupContextualized = function(concept,selectorId) {									
+			ConceptualFramework.prototype.setupContextualized = function(concept,selectorId,title) {									
 				var self = this;
 				self.contextulized[concept] = self.contextulized[concept]?self.contextulized[concept]:{};
 				self.contextulized[concept].selectorId = selectorId;				
+				self.contextulized[concept].title = title;				
 			}			
 			ConceptualFramework.prototype.addAvailableConcept = function(concept,id, value, description) {
 				var	self = this;
 				self.available[concept] = self.available[concept]?self.available[concept]:{};				
-				self.available[concept][id] = {value:value,description:description};				
-				$("#"+self.selected[concept].selectorId).append('<option value="'+id+'">'+self.available[concept][id].value+'</option>');				
+				self.available[concept][id] = {value:value,description:description};										
 			}			
+			ConceptualFramework.prototype.printAvailableConcept = function(concept) {
+				var	self = this;
+				Object.keys(self.available[concept]).forEach(function(key) {
+					$("#"+self.selected[concept].selectorId).append('<option value="'+key+'">'+self.available[concept][key].value+'</option>');	
+				});				
+			}						
 			var framework = new ConceptualFramework();			
 			framework.setup("useCase","selected_use_case","selected_use_case_description");						
 			framework.addAvailableConcept("useCase","sdm","Species Distribution Modelling", "Species distribution modeling uses, encopassing niche modeling and ...");
 			framework.addAvailableConcept("useCase","sc","Brazillian National Checklist of Species", "Official species checklist of Brazil");
+			framework.printAvailableConcept("useCase");
 
 			framework.setup("ie","selected_ie","selected_ie_description","ie_add","itens_ie");
-			framework.addAvailableConcept("ie","coord","Coordinates", "Decimal Latitude, Decimal Longitude, Geodetic Datum and Coordinates Uncertainty in Meters");
+			framework.addAvailableConcept("ie","coord","Coordinates","Latitude, Longitude, Geodetic Datum and Coordinates Uncertainty in Meters");
 			framework.addAvailableConcept("ie","sciName","Scientific Name", "Complete scientific name");
 			framework.addAvailableConcept("ie","date","Event Date", "Date and time whether event occur");
 			framework.addAvailableConcept("ie","country","Country", "Country name and country code where the event occur");
+			framework.printAvailableConcept("ie");
 
-			framework.setupContextualized("dimension","dimension_content");
-			framework.setupContextualized("criterion","criterion_content");
-			framework.setupContextualized("enhancement","enhancement_content");
+			framework.addAvailableConcept("dimension","completeness","Completeness", "Completnes is....");
+			framework.addAvailableConcept("dimension","granularity","Granularity", "This dimension is....");
+			framework.addAvailableConcept("dimension","consistency","Consistency", "This dimension is....");
+			framework.addAvailableConcept("dimension","conformance","Conformance", "This dimension is....");
+
+			framework.setupContextualized("dimension","dimension_content","DQ Dimensions");
+			framework.setupContextualized("criterion","criterion_content", "DQ Criteria");
+			framework.setupContextualized("enhancement","enhancement_content", "DQ Enhancements");
 
 
 
