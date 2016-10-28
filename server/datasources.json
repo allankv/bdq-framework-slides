@@ -4,11 +4,8 @@
     "connector": "memory"
   },
   "BDD": {
-    "host": "mongo",
-    "port": 27017,
-    "database": "bdd",
-    "name": "BDD",
-    "connector": "mongodb"
+    "name": "db",
+    "connector": "memory"
   },
   "files-storage": {
     "name": "files-storage",
