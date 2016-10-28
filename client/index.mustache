@@ -185,8 +185,8 @@
 					</p>
 					<blockquote id="selected_ie_description">						
 					</blockquote>
-					<ul id="itens_ie">					  
-					</ul>
+					<div id="itens_ie">					  
+					</div>
 				</section>	
 				<section id="dimension_content">
 				 	<h2>3. Select a set of DQ Dimensions</h2>
@@ -232,10 +232,14 @@
 				});
 				if(addButton){
 					$("#"+addButton).click(function() {
-						self.profile[concept] = self.profile[concept]?self.profile[concept]:[];
-						self.profile[concept].push(self.available[concept][$("#"+self.selected[concept].selectorId).val()]);
-						$("#"+itens).append('<li>'+self.available[concept][$("#"+self.selected[concept].selectorId).val()].value+'</li>');
-						self.updateContextualizedDimension();
+						self.profile[concept] = self.profile[concept]?self.profile[concept]:{};
+						if(!self.profile[concept][$("#"+self.selected[concept].selectorId).val()]){							
+							self.profile[concept][$("#"+self.selected[concept].selectorId).val()] = self.available[concept][$("#"+self.selected[concept].selectorId).val()];
+							$("#"+itens).append('<span><small><strong>'+self.available[concept][$("#"+self.selected[concept].selectorId).val()].value+'</strong>: '+self.available[concept][$("#"+self.selected[concept].selectorId).val()].description+'</small></span><br>');
+							self.updateContextualizedDimension();
+							Reveal.right();
+							Reveal.left();
+						}						
 					});
 				}			
 			}	
@@ -247,8 +251,8 @@
 					var content = $(`<section>
 									<h3>3. Define a set of important `+self.contextulized[key].title+` for <strong>`+self.profile.ie[keyIE].value+`</strong></h3>	
 									<div id="content_`+key+`_`+keyIE+`"></div>
-									<ul id="`+key+`_`+keyIE+`_list">
-									</ul>
+									<div id="`+key+`_`+keyIE+`_list">
+									</div>
 									</section>`);
 					var dimensionsContent = $('<select id="available_'+key+'_'+keyIE+'"></select>');
 					Object.keys(self.available.dimension).forEach(function(id) {
@@ -260,24 +264,31 @@
 					});
 					var define = $('<button>Define</button>');
 					define.click(function() {
+						self.profile.measurement = self.profile.measurement?self.profile.measurement:{};
 						var dimensionId = $('#available_'+key+'_'+keyIE).val();
 						var dimension = self.available.dimension[dimensionId].value;
 						var ie = self.profile.ie[keyIE].value;
 						var drId = $('#avaiable_resource_type_'+keyIE).val();							
 						var dr = self.available.resourceType[drId].value;		
-						var contextulizedId = keyIE+"-"+drId+"-"+dimensionId;				
-						content.find("#"+key+"_"+keyIE+"_list").append('<li>'+dimension+' of '+ie+' of '+dr+': <input id="definition_'+contextulizedId+'" type="text"></input></li>');
-						self.profile.measurement = self.profile.measurement?self.profile.measurement:{};							
-						self.profile.measurement[contextulizedId] = self.profile.measurement[contextulizedId]?self.profile.measurement[contextulizedId]:{};
-						self.profile.measurement[contextulizedId].definition = '';
-						content.find('#definition_'+contextulizedId).change(function() {								
+						var contextulizedId = keyIE+"-"+drId+"-"+dimensionId;
+
+						if(!self.profile.measurement[contextulizedId]){							
+							content.find("#"+key+"_"+keyIE+"_list").append('<span><small><strong>'+dimension+'</strong> of '+ie+' of '+dr+': <input id="definition_'+contextulizedId+'" type="text" placeholder="Definition"></input></small></span><br>');
+
+							self.profile.measurement[contextulizedId] = self.profile.measurement[contextulizedId]?self.profile.measurement[contextulizedId]:{};
 							self.profile.measurement[contextulizedId].dimension = self.available.dimension[dimensionId];
 							self.profile.measurement[contextulizedId].ie = self.available.ie[keyIE];
 							self.profile.measurement[contextulizedId].resourceType = self.available.resourceType[drId];
 							self.profile.measurement[contextulizedId].definition = $('#definition_'+contextulizedId).val();
+							
+							content.find('#definition_'+contextulizedId).change(function() {															
+								self.profile.measurement[contextulizedId].definition = $('#definition_'+contextulizedId).val();
+								self.updateContextualizedCriterion();
+							});
 							self.updateContextualizedCriterion();
-						});
-						self.updateContextualizedCriterion();
+							Reveal.right();
+							Reveal.left();
+						}						
 					});
 					content.find("#content_"+key+"_"+keyIE).append(self.contextulized[key].title+': ').append(dimensionsContent).append("<br>").append("Resource Type: ").append(resourceTypeContent).append("<br>").append(define);
 					$("#"+self.contextulized[key].selectorId).append(content);						
@@ -296,7 +307,14 @@
 									</section>`);
 					// var criteriaContent = $('<select id="available_'+key+'_'+keyIE+'"></select>');
 					Object.keys(self.profile.measurement).forEach(function(id) {
-						content.find('#content_'+key+'_'+keyIE).append('<p id="'+id+'">'+self.profile.measurement[id].definition+'</p>');	
+						// console.log("LOG: ",id);
+						// console.log("self.profile.measurement[id]: ",self.profile.measurement[id]);
+						if(self.profile.measurement[id].ie.id == keyIE){
+							content.find('#content_'+key+'_'+keyIE).append('<span id="'+id+'"><small>The measure for <strong>'+
+								self.profile.measurement[id].dimension.value+' of '+
+								self.profile.measurement[id].ie.value+' of '+
+								self.profile.measurement[id].resourceType.value+'</strong> must be: <input type="text" placeholder="Acceptable value"></input></small></span><br>');	
+						}						
 					});
 
 					// var resourceTypeContent = $('<select id="avaiable_resource_type_'+keyIE+'"></select>');
@@ -333,7 +351,7 @@
 			ConceptualFramework.prototype.addAvailableConcept = function(concept,id, value, description) {
 				var	self = this;
 				self.available[concept] = self.available[concept]?self.available[concept]:{};				
-				self.available[concept][id] = {value:value,description:description};										
+				self.available[concept][id] = {id:id, value:value,description:description};										
 			}			
 			ConceptualFramework.prototype.printAvailableConcept = function(concept) {
 				var	self = this;
