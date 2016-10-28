@@ -136,7 +136,7 @@
 						<strong>3. DQ IMPROVEMENT METHOD:</strong><br> A manner of procedure, especially an orderly, logical, or systematic way of instruction for <b>DQ IMPROVEMENT</b>.
 					</p>
 					<p>
-						<strong>4. MECHANISMS:</strong><br> An actor (software, hardware or person) that <b>IMPLEMENTS AND EXECUTE</b> DQ methods.
+						<strong>4. MECHANISMS:</strong><br> An actor (software, hardware or person) that <b>IMPLEMENTS AND EXECUTES</b> DQ methods.
 					</p>					
 				</section>					
 				<!-- DQ REPORT -->				
@@ -181,18 +181,21 @@
 						<select id="selected_ie" style="height: 30px">						  
 						  <option value=""></option>					  
 						</select>
-						<button id="ie_add">Add</button>
+						<button id="ie_add">Select</button>
 					</p>
 					<blockquote id="selected_ie_description">						
 					</blockquote>
 					<ul id="itens_ie">					  
 					</ul>
 				</section>	
-				<section id="dimension_content">					
-				</section>
+				<section id="dimension_content">
+				 	<h2>3. Select a set of DQ Dimensions</h2>
+				</section>				
 				<section id="criterion_content">					
+					<h2>4. Select a set of DQ Criteria</h2>
 				</section>
 				<section id="enhancement_content">					
+					<h2>5. Select a set of DQ Enhancements</h2>
 				</section>
 				<!-- <section data-menu-title="4. Contextualized Criteria">
 					<h3>4. Select a set of Contextualized Criteria</h3>
@@ -232,28 +235,95 @@
 						self.profile[concept] = self.profile[concept]?self.profile[concept]:[];
 						self.profile[concept].push(self.available[concept][$("#"+self.selected[concept].selectorId).val()]);
 						$("#"+itens).append('<li>'+self.available[concept][$("#"+self.selected[concept].selectorId).val()].value+'</li>');
-						self.updateContextualized();
+						self.updateContextualizedDimension();
 					});
 				}			
 			}	
-			ConceptualFramework.prototype.updateContextualized = function() {
-				var self = this;
-				Object.keys(self.contextulized).forEach(function(key) {
-					$("#"+self.contextulized[key].selectorId).html('');
-					Object.keys(self.profile.ie).forEach(function(keyIE) {
-						var content = $(`<section>
-										<h3>3. Define a set of important `+self.contextulized[key].title+` for `+self.profile.ie[keyIE].value+`</h3>	
-										<div id="content_`+key+`"/>
-										</section>`);
-						var dimensionsContent = $('<select></select>');
-						Object.keys(self.available[concept]).forEach(function(id) {
-							dimensionsContent.append('<option value="'+id+'">'+self.available[concept][id].value+'</option>');	
-						});
-						content.find("#content_"+key).append(self.contextulized[key].title+': ').append(dimensionsContent);		
-						$("#"+self.contextulized[key].selectorId).append(content);
+			ConceptualFramework.prototype.updateContextualizedDimension = function() {
+				var self = this;				
+				var key = "dimension";
+				$("#"+self.contextulized[key].selectorId).html('');
+				Object.keys(self.profile.ie).forEach(function(keyIE) {
+					var content = $(`<section>
+									<h3>3. Define a set of important `+self.contextulized[key].title+` for <strong>`+self.profile.ie[keyIE].value+`</strong></h3>	
+									<div id="content_`+key+`_`+keyIE+`"></div>
+									<ul id="`+key+`_`+keyIE+`_list">
+									</ul>
+									</section>`);
+					var dimensionsContent = $('<select id="available_'+key+'_'+keyIE+'"></select>');
+					Object.keys(self.available.dimension).forEach(function(id) {
+						dimensionsContent.append('<option value="'+id+'">'+self.available.dimension[id].value+'</option>');	
 					});
-				});				
-			}			
+					var resourceTypeContent = $('<select id="avaiable_resource_type_'+keyIE+'"></select>');
+					Object.keys(self.available.resourceType).forEach(function(id) {
+						resourceTypeContent.append('<option value="'+id+'">'+self.available.resourceType[id].value+'</option>');	
+					});
+					var define = $('<button>Define</button>');
+					define.click(function() {
+						var dimensionId = $('#available_'+key+'_'+keyIE).val();
+						var dimension = self.available.dimension[dimensionId].value;
+						var ie = self.profile.ie[keyIE].value;
+						var drId = $('#avaiable_resource_type_'+keyIE).val();							
+						var dr = self.available.resourceType[drId].value;		
+						var contextulizedId = keyIE+"-"+drId+"-"+dimensionId;				
+						content.find("#"+key+"_"+keyIE+"_list").append('<li>'+dimension+' of '+ie+' of '+dr+': <input id="definition_'+contextulizedId+'" type="text"></input></li>');
+						self.profile.measurement = self.profile.measurement?self.profile.measurement:{};							
+						self.profile.measurement[contextulizedId] = self.profile.measurement[contextulizedId]?self.profile.measurement[contextulizedId]:{};
+						self.profile.measurement[contextulizedId].definition = '';
+						content.find('#definition_'+contextulizedId).change(function() {								
+							self.profile.measurement[contextulizedId].dimension = self.available.dimension[dimensionId];
+							self.profile.measurement[contextulizedId].ie = self.available.ie[keyIE];
+							self.profile.measurement[contextulizedId].resourceType = self.available.resourceType[drId];
+							self.profile.measurement[contextulizedId].definition = $('#definition_'+contextulizedId).val();
+							self.updateContextualizedCriterion();
+						});
+						self.updateContextualizedCriterion();
+					});
+					content.find("#content_"+key+"_"+keyIE).append(self.contextulized[key].title+': ').append(dimensionsContent).append("<br>").append("Resource Type: ").append(resourceTypeContent).append("<br>").append(define);
+					$("#"+self.contextulized[key].selectorId).append(content);						
+				});					
+			}
+			ConceptualFramework.prototype.updateContextualizedCriterion = function() {
+				var self = this;
+				var key = "criterion";
+				$("#"+self.contextulized[key].selectorId).html('');
+				Object.keys(self.profile.ie).forEach(function(keyIE) {					
+					var content = $(`<section>
+									<h3>3. Define a set of important `+self.contextulized[key].title+` for <strong>`+self.profile.ie[keyIE].value+`</strong></h3>	
+									<div id="content_`+key+`_`+keyIE+`"></div>
+									
+									</ul>
+									</section>`);
+					// var criteriaContent = $('<select id="available_'+key+'_'+keyIE+'"></select>');
+					Object.keys(self.profile.measurement).forEach(function(id) {
+						content.find('#content_'+key+'_'+keyIE).append('<p id="'+id+'">'+self.profile.measurement[id].definition+'</p>');	
+					});
+
+					// var resourceTypeContent = $('<select id="avaiable_resource_type_'+keyIE+'"></select>');
+					// Object.keys(self.available.resourceType).forEach(function(id) {
+					// 	resourceTypeContent.append('<option value="'+id+'">'+self.available.resourceType[id].value+'</option>');	
+					// });
+					// var define = $('<button>Define</button>');
+					// define.click(function() {
+					// 	var dimensionId = $('#available_'+key+'_'+keyIE).val();
+					// 	var dimension = self.available.dimension[dimensionId].value;
+					// 	var ie = self.profile.ie[keyIE].value;
+					// 	var drId = $('#avaiable_resource_type_'+keyIE).val();							
+					// 	var dr = self.available.resourceType[drId].value;		
+					// 	var contextulizedId = keyIE+"-"+drId+"-"+dimensionId;				
+					// 	content.find("#"+key+"_"+keyIE+"_list").append('<li>'+dimension+' of '+ie+' of '+dr+': <input id="definition_'+contextulizedId+'" type="text"></input></li>');
+					// 	self.profile.measurement = self.profile.measurement?self.profile.measurement:{};							
+					// 	self.profile.measurement[contextulizedId] = self.profile.measurement[contextulizedId]?self.profile.measurement[contextulizedId]:{};
+					// 	self.profile.measurement[contextulizedId].definition = '';
+					// 	content.find('#definition_'+contextulizedId).change(function() {								
+					// 		self.profile.measurement[contextulizedId].definition = $('#definition_'+contextulizedId).val();
+					// 		console.log("LOG: ",self.profile.measurement[contextulizedId].definition);
+					// 	});
+					// });
+					// content.find("#content_"+key+"_"+keyIE).append(self.contextulized[key].title+': ').append(criteriaContent).append("<br>").append("Resource Type: ").append(resourceTypeContent).append("<br>").append(define);
+					$("#"+self.contextulized[key].selectorId).append(content);						
+				});					
+			}
 			ConceptualFramework.prototype.setupContextualized = function(concept,selectorId,title) {									
 				var self = this;
 				self.contextulized[concept] = self.contextulized[concept]?self.contextulized[concept]:{};
@@ -272,6 +342,10 @@
 				});				
 			}						
 			var framework = new ConceptualFramework();			
+			framework.addAvailableConcept("resourceType","dataset","Dataset", "Dataset or subset");
+			framework.addAvailableConcept("resourceType","record","Single Record", "Single record");
+			
+
 			framework.setup("useCase","selected_use_case","selected_use_case_description");						
 			framework.addAvailableConcept("useCase","sdm","Species Distribution Modelling", "Species distribution modeling uses, encopassing niche modeling and ...");
 			framework.addAvailableConcept("useCase","sc","Brazillian National Checklist of Species", "Official species checklist of Brazil");
@@ -360,7 +434,7 @@
 			        // If true allows the user to open and navigate the menu using
 			        // the keyboard. Standard keyboard interaction with reveal
 			        // will be disabled while the menu is open.
-			        keyboard: true
+			        keyboard: false
 			    },
 
 				history: true,
@@ -383,7 +457,9 @@
 				],
 			    keyboard: { 
 			        82: function() { Recorder.toggleRecording(); }, // press 'r' to start/stop recording
-			        90: function() { Recorder.downloadZip(); }  // press 'z' to download zip containing audio files
+			        90: function() { Recorder.downloadZip(); },  // press 'z' to download zip containing audio files
+			        77: null
+
 			    }
 			});
 		</script>
