@@ -99,8 +99,11 @@
 							Define the <strong>status of quality of a data resource</strong> according to a given DQ Needs.
 						</p>	
 					</section>
-					<section data-menu-title="The Framework in Biodiversity Informatics Context">
+					<section style="padding: 0px;margin:0px;" data-menu-title="The Framework in Biodiversity Informatics Context">
 						<img style="width: 100%" src="img/scenario.png">
+					</section>
+					<section style="padding: 0px;margin:0px;" data-menu-title="The Framework in Biodiversity Informatics Context">
+						<img style="padding: 0px;margin:0px; width: 100%" src="img/framework.png">
 					</section>
 				</section>
 
@@ -162,27 +165,27 @@
 				<!-- DQ PROFILE -->
 				<section data-menu-title="DQ PROFILE">
 					<h1>How to define a DQ Profile?</h1>
-					<strong>DQ Profile Scratcher    >>> </strong>
+					<!-- <strong>DQ Profile Builder    >>> </strong> -->
 				</section>	
 				<section data-menu-title="1. Use Case">
 					<h3>1. Select a Use Case</h3>
-					<p>
-						Use cases: 
-						<select id="selected_use_case" style="height: 30px">						  
+					<div style="display:inline-block; min-width:2.2cm; height:3.8cm; align: center;vertical-align: middle;">
+						<p>Use cases: <img width="24" style="border:0; background: #111; vertical-align: middle;" title="A data use CONTEXT" src="/img/help.png" > </p> 
+						<select style="vertical-align: middle;" id="selected_use_case" >						  
 						  <option value=""></option>					  
 						</select>
-					</p>
+					</div>
 					<blockquote id="selected_use_case_description">						
 					</blockquote>
 				</section>	
 				<section data-menu-title="2. Valuable Information Elements">
 					<h3>2. Select a set of valuable Information Elements (IE)</h3>
 					<p>
-						IE: 
-						<select id="selected_ie" style="height: 30px">						  
+						IE: <img width="24" style="border:0; background: #111; vertical-align: middle;" title="A set of INFORMATION valuable in the Use Case context." src="/img/help.png" >
+						<select id="selected_ie" style="vertical-align: middle;">						  
 						  <option value=""></option>					  
 						</select>
-						<button id="ie_add">Select</button>
+						<button id="ie_add" style="vertical-align: middle;">Select</button>
 					</p>
 					<blockquote id="selected_ie_description">						
 					</blockquote>
@@ -191,12 +194,49 @@
 				</section>	
 				<section id="dimension_content">
 				 	<h2>3. Select a set of DQ Dimensions</h2>
+				 	<i>Select a Valuable Information Element first.</i>
 				</section>				
 				<section id="criterion_content">					
 					<h2>4. Select a set of DQ Criteria</h2>
+					<i>Define a DQ Dimension first.</i>
 				</section>
 				<section id="enhancement_content">					
 					<h2>5. Select a set of DQ Enhancements</h2>
+					<i>Define a DQ Dimension first.</i>
+				</section>
+				<section>
+					<section>					
+						(1/4)<h2 name="profile_title">Defined DQ Profile</h3>
+						<blockquote name="profile_use_case_definition"></blockquote>
+						<h3>Valuable Information Elements</h3>
+						<dir id="vie_content">
+							<i>No Valuable Information Element defined.</i>
+						</dir>
+					</section>
+					<section>					
+						(2/4)<h2 name="profile_title">Defined DQ Profile</h2>	
+						<blockquote name="profile_use_case_definition"></blockquote>					
+						<h3>DQ Measurement Policy</h3>
+						<dir id="measurement_policy_content">
+							<i>No DQ Dimension defined.</i>			
+						</dir>
+					</section>
+					<section>					
+						(3/4)<h2 name="profile_title">Defined DQ Profile</h2>	
+						<blockquote name="profile_use_case_definition"></blockquote>											
+						<h3>DQ Validation Policy</h3>
+						<dir id="validation_policy_content">
+							<i>No DQ Criterion defined.</i>					
+						</dir>
+					</section>
+					<section>					
+						(4/4)<h2 name="profile_title">Defined DQ Profile</h2>	
+						<blockquote name="profile_use_case_definition"></blockquote>											
+						<h3>DQ Improvement Policy</h3>
+						<dir id="improvement_policy_content">
+							<i>No DQ Enhancement defined.</i>
+						</dir>
+					</section>
 				</section>
 				<!-- <section data-menu-title="4. Contextualized Criteria">
 					<h3>4. Select a set of Contextualized Criteria</h3>
@@ -218,7 +258,9 @@
 				this.contextulized = {};
 				this.selected = {};
 				this.available = {};
-				this.profile = {};				
+				this.profile = {};		
+				this.nD = 0;
+				this.nE = 0;
 			}
 			ConceptualFramework.prototype.setup = function(concept,selectorId,selectorIdDescription, addButton,itens) {							
 				var self = this;
@@ -226,9 +268,10 @@
 				self.selected[concept].selectorId = selectorId;
 				self.selected[concept].selectorIdDescription = selectorIdDescription;				
 				$("#"+self.selected[concept].selectorId).change(function() {
-					$("#"+selectorIdDescription).html(self.available[concept][$("#"+self.selected[concept].selectorId).val()].description);
+					$("#"+selectorIdDescription).html('<strong>Definition</strong>: '+self.available[concept][$("#"+self.selected[concept].selectorId).val()].description);		
 					if(!addButton){
 						self.profile[concept] = self.available[concept][$("#"+self.selected[concept].selectorId).val()];
+						self.updateProfileUseCase();
 					}
 				});
 				if(addButton){
@@ -238,61 +281,89 @@
 							self.profile[concept][$("#"+self.selected[concept].selectorId).val()] = self.available[concept][$("#"+self.selected[concept].selectorId).val()];
 							$("#"+itens).append('<span><small><strong>'+self.available[concept][$("#"+self.selected[concept].selectorId).val()].value+'</strong>: '+self.available[concept][$("#"+self.selected[concept].selectorId).val()].description+'</small></span><br>');
 							self.updateContextualizedDimension();
+							self.updateProfileVIE();
 							Reveal.right();
 							Reveal.left();
 						}						
 					});
 				}			
 			}	
+			ConceptualFramework.prototype.updateProfileUseCase = function() {
+				var self = this;	
+				$("h2[name*='profile_title'").html('DQ Profile for <strong>'+self.profile.useCase.value+'</strong>');				
+				$("blockquote[name*='profile_use_case_definition'").html(''+self.profile.useCase.description+'');				
+			}
+			ConceptualFramework.prototype.updateProfileVIE = function() {
+				var self = this;								
+				$('#vie_content').html('');
+				Object.keys(self.profile.ie).forEach(function(key) {
+					$('#vie_content').append('<p>'+self.profile.ie[key].value+'</p>');				
+				});								
+			}
 			ConceptualFramework.prototype.updateContextualizedDimension = function() {
 				var self = this;				
 				var key = "dimension";
-				$("#"+self.contextulized[key].selectorId).html('');
-				Object.keys(self.profile.ie).forEach(function(keyIE) {
-					var content = $(`<section>
-									<h3>3. Define a set of important `+self.contextulized[key].title+` for <strong>`+self.profile.ie[keyIE].value+`</strong></h3>	
+				if(Object.keys(self.profile.ie).length==1)
+					$("#"+self.contextulized[key].selectorId).html('');
+				Object.keys(self.profile.ie).forEach(function(keyIE) {					
+					if($('#content_'+key+'_'+keyIE).length==0){
+						console.log("LOG: ",'#content_'+key+'_'+keyIE);
+						var content = $(`<section>
+									<h3>3. Define a set of important `+self.contextulized[key].title+` for <strong>`+self.profile.ie[keyIE].value+`</strong></h3>
 									<div id="content_`+key+`_`+keyIE+`"></div>
+									<blockquote id="selected_dimension_`+key+`_`+keyIE+`_description">						
+									</blockquote>
 									<div id="`+key+`_`+keyIE+`_list">
 									</div>
 									</section>`);
-					var dimensionsContent = $('<select id="available_'+key+'_'+keyIE+'"></select>');
-					Object.keys(self.available.dimension).forEach(function(id) {
-						dimensionsContent.append('<option value="'+id+'">'+self.available.dimension[id].value+'</option>');	
-					});
-					var resourceTypeContent = $('<select id="avaiable_resource_type_'+keyIE+'"></select>');
-					Object.keys(self.available.resourceType).forEach(function(id) {
-						resourceTypeContent.append('<option value="'+id+'">'+self.available.resourceType[id].value+'</option>');	
-					});
-					var define = $('<button>Define</button>');
-					define.click(function() {
-						self.profile.measurement = self.profile.measurement?self.profile.measurement:{};
-						var dimensionId = $('#available_'+key+'_'+keyIE).val();
-						var dimension = self.available.dimension[dimensionId].value;
-						var ie = self.profile.ie[keyIE].value;
-						var drId = $('#avaiable_resource_type_'+keyIE).val();							
-						var dr = self.available.resourceType[drId].value;		
-						var contextulizedId = keyIE+"-"+drId+"-"+dimensionId;
+						var dimensionsContent = $('<select style="vertical-align: middle;" id="available_'+key+'_'+keyIE+'"></select>');					
+						Object.keys(self.available.dimension).forEach(function(id) {
+							dimensionsContent.append('<option value="'+id+'">'+self.available.dimension[id].value+'</option>');	
+						});					
+						dimensionsContent.change(function() {
+							if(dimensionsContent.val())												
+								$('#selected_dimension_'+key+'_'+keyIE+'_description').html(self.available.dimension[dimensionsContent.val()].description);
+							else
+								$('#selected_dimension_'+key+'_'+keyIE+'_description').html('');
+						});	
+						dimensionsContent.append('<option value=""></option>');
+						var resourceTypeContent = $('<select style="vertical-align: middle;" id="avaiable_resource_type_'+keyIE+'"></select>');
+						Object.keys(self.available.resourceType).forEach(function(id) {
+							resourceTypeContent.append('<option value="'+id+'">'+self.available.resourceType[id].value+'</option>');	
+						});
+						var define = $('<button>Define</button>');
+						define.click(function() {
+							self.profile.measurement = self.profile.measurement?self.profile.measurement:{};
+							var dimensionId = $('#available_'+key+'_'+keyIE).val();
+							var dimension = self.available.dimension[dimensionId].value;
+							var ie = self.profile.ie[keyIE].value;
+							var drId = $('#avaiable_resource_type_'+keyIE).val();							
+							var dr = self.available.resourceType[drId].value;		
+							var contextulizedId = keyIE+"-"+drId+"-"+dimensionId;
 
-						if(!self.profile.measurement[contextulizedId]){							
-							content.find("#"+key+"_"+keyIE+"_list").append('<span><small><strong>'+dimension+'</strong> of '+ie+' of '+dr+': <input id="definition_'+contextulizedId+'" type="text" placeholder="Definition"></input></small></span><br>');
+							if(!self.profile.measurement[contextulizedId]){							
+								content.find("#"+key+"_"+keyIE+"_list").append('<span><small><strong>'+dimension+'</strong> of '+ie+' of '+dr+': <input id="definition_'+contextulizedId+'" type="text" placeholder="Definition"></input></small></span><br>');
 
-							self.profile.measurement[contextulizedId] = self.profile.measurement[contextulizedId]?self.profile.measurement[contextulizedId]:{};
-							self.profile.measurement[contextulizedId].dimension = self.available.dimension[dimensionId];
-							self.profile.measurement[contextulizedId].ie = self.available.ie[keyIE];
-							self.profile.measurement[contextulizedId].resourceType = self.available.resourceType[drId];
-							self.profile.measurement[contextulizedId].definition = $('#definition_'+contextulizedId).val();
-							
-							content.find('#definition_'+contextulizedId).change(function() {															
+								self.profile.measurement[contextulizedId] = self.profile.measurement[contextulizedId]?self.profile.measurement[contextulizedId]:{};
+								self.profile.measurement[contextulizedId].dimension = self.available.dimension[dimensionId];
+								self.profile.measurement[contextulizedId].ie = self.available.ie[keyIE];
+								self.profile.measurement[contextulizedId].resourceType = self.available.resourceType[drId];
 								self.profile.measurement[contextulizedId].definition = $('#definition_'+contextulizedId).val();
+								
+								content.find('#definition_'+contextulizedId).change(function() {															
+									self.profile.measurement[contextulizedId].definition = $('#definition_'+contextulizedId).val();
+									self.updateContextualizedCriterion();
+									self.updateContextualizedEnhancement();
+								});
 								self.updateContextualizedCriterion();
-							});
-							self.updateContextualizedCriterion();
-							Reveal.right();
-							Reveal.left();
-						}						
-					});
-					content.find("#content_"+key+"_"+keyIE).append(self.contextulized[key].title+': ').append(dimensionsContent).append("<br>").append("Resource Type: ").append(resourceTypeContent).append("<br>").append(define);
-					$("#"+self.contextulized[key].selectorId).append(content);						
+								self.updateContextualizedEnhancement();
+								Reveal.right();
+								Reveal.left();
+							}						
+						});
+						content.find("#content_"+key+"_"+keyIE).append(self.contextulized[key].title+': ').append(dimensionsContent).append("<br>").append("Resource Type: ").append(resourceTypeContent).append("<br>").append(define);					
+						$("#"+self.contextulized[key].selectorId).append(content);	
+					}										
 				});					
 			}
 			ConceptualFramework.prototype.updateContextualizedCriterion = function() {
@@ -305,11 +376,8 @@
 									<div id="content_`+key+`_`+keyIE+`"></div>
 									
 									</ul>
-									</section>`);
-					// var criteriaContent = $('<select id="available_'+key+'_'+keyIE+'"></select>');
-					Object.keys(self.profile.measurement).forEach(function(id) {
-						// console.log("LOG: ",id);
-						// console.log("self.profile.measurement[id]: ",self.profile.measurement[id]);
+									</section>`);					
+					Object.keys(self.profile.measurement).forEach(function(id) {						
 						if(self.profile.measurement[id].ie.id == keyIE){
 							content.find('#content_'+key+'_'+keyIE).append('<span id="'+id+'"><small>The measure for <strong>'+
 								self.profile.measurement[id].dimension.value+' of '+
@@ -317,29 +385,6 @@
 								self.profile.measurement[id].resourceType.value+'</strong> must be: <input type="text" placeholder="Acceptable value"></input></small></span><br>');	
 						}						
 					});
-
-					// var resourceTypeContent = $('<select id="avaiable_resource_type_'+keyIE+'"></select>');
-					// Object.keys(self.available.resourceType).forEach(function(id) {
-					// 	resourceTypeContent.append('<option value="'+id+'">'+self.available.resourceType[id].value+'</option>');	
-					// });
-					// var define = $('<button>Define</button>');
-					// define.click(function() {
-					// 	var dimensionId = $('#available_'+key+'_'+keyIE).val();
-					// 	var dimension = self.available.dimension[dimensionId].value;
-					// 	var ie = self.profile.ie[keyIE].value;
-					// 	var drId = $('#avaiable_resource_type_'+keyIE).val();							
-					// 	var dr = self.available.resourceType[drId].value;		
-					// 	var contextulizedId = keyIE+"-"+drId+"-"+dimensionId;				
-					// 	content.find("#"+key+"_"+keyIE+"_list").append('<li>'+dimension+' of '+ie+' of '+dr+': <input id="definition_'+contextulizedId+'" type="text"></input></li>');
-					// 	self.profile.measurement = self.profile.measurement?self.profile.measurement:{};							
-					// 	self.profile.measurement[contextulizedId] = self.profile.measurement[contextulizedId]?self.profile.measurement[contextulizedId]:{};
-					// 	self.profile.measurement[contextulizedId].definition = '';
-					// 	content.find('#definition_'+contextulizedId).change(function() {								
-					// 		self.profile.measurement[contextulizedId].definition = $('#definition_'+contextulizedId).val();
-					// 		console.log("LOG: ",self.profile.measurement[contextulizedId].definition);
-					// 	});
-					// });
-					// content.find("#content_"+key+"_"+keyIE).append(self.contextulized[key].title+': ').append(criteriaContent).append("<br>").append("Resource Type: ").append(resourceTypeContent).append("<br>").append(define);
 					$("#"+self.contextulized[key].selectorId).append(content);						
 				});					
 			}
@@ -359,34 +404,89 @@
 				Object.keys(self.available[concept]).forEach(function(key) {
 					$("#"+self.selected[concept].selectorId).append('<option value="'+key+'">'+self.available[concept][key].value+'</option>');	
 				});				
-			}						
-			var framework = new ConceptualFramework();			
+			}	
+			ConceptualFramework.prototype.updateContextualizedEnhancement = function() {
+				var self = this;				
+				var key = "enhancement";
+				if(Object.keys(self.profile.measurement).length==1) $("#"+self.contextulized[key].selectorId).html('');
+				
+				Object.keys(self.profile.measurement).forEach(function(keyDimension) {	
+					var keyIE = self.profile.measurement[keyDimension].ie.id;				
+					if($('#content_'+key+'_'+keyIE+'_'+keyDimension).length==0){							
+						var content = $(`<section>
+									<h3>3. Define a set of important `+self.contextulized[key].title+` to improve <strong>`+self.profile.measurement[keyDimension].dimension.value+`</strong> of <strong>`+self.profile.ie[keyIE].value+`</strong> of <strong>`+self.profile.measurement[keyDimension].resourceType.value+`</strong></h3>	
+									<small>`+self.profile.measurement[keyDimension].definition+`</small>
+									<div id="content_`+key+`_`+keyIE+'_'+keyDimension+`"></div>
+									<blockquote id="selected_dimension_`+key+`_`+keyIE+'_'+keyDimension+`_description">						
+									</blockquote>
+									<div id="`+key+`_`+keyIE+'_'+keyDimension+`_list">
+									</div>
+									</section>`);
+						content.find('#content_'+key+'_'+keyIE+'_'+keyDimension).append('DQ Enhancement: <input type="text"></input>');
+						var enhancementType = $('<select style="vertical-align: middle;" id="avaiable_enhancement_type_'+keyIE+'"></select>');
+						Object.keys(self.available.enhancementType).forEach(function(id) {
+							enhancementType.append('<option value="'+id+'">'+self.available.enhancementType[id].value+'</option>');	
+						});
+						var define = $('<button>Define</button>');
+						define.click(function() {
+							self.profile.improvement = self.profile.improvement?self.profile.improvement:{};
+							var dimensionId = $('#available_'+key+'_'+keyIE).val();
+							var dimension = self.available.dimension[dimensionId].value;
+							var ie = self.profile.ie[keyIE].value;
+							var drId = $('#avaiable_enhancement_type_'+keyIE).val();							
+							var dr = self.available.enhancementType[drId].value;		
+							var contextulizedId = keyIE+"-"+drId+"-"+dimensionId;
+
+							if(!self.profile.improvement[contextulizedId]){							
+								content.find("#"+key+"_"+keyIE+'_'+keyDimension+"_list").append('<span><small><strong>'+dimension+'</strong> of '+ie+' of '+dr+': <input id="definition_'+contextulizedId+'" type="text" placeholder="Definition"></input></small></span><br>');
+
+								self.profile.improvement[contextulizedId] = self.profile.improvement[contextulizedId]?self.profile.improvement[contextulizedId]:{};
+								self.profile.improvement[contextulizedId].dimension = self.available.dimension[dimensionId];
+								self.profile.improvement[contextulizedId].ie = self.available.ie[keyIE];
+								self.profile.improvement[contextulizedId].enhancementType = self.available.enhancementType[drId];
+								self.profile.improvement[contextulizedId].definition = $('#definition_'+contextulizedId).val();
+								
+								content.find('#definition_'+contextulizedId).change(function() {															
+									self.profile.measurement[contextulizedId].definition = $('#definition_'+contextulizedId).val();
+								});									
+								Reveal.right();
+								Reveal.left();
+							}						
+						});
+						content.find("#content_"+key+"_"+keyIE+'_'+keyDimension).append("<br>").append("Enhancement Type: ").append(enhancementType).append("<br>").append(define);					
+						$("#"+self.contextulized[key].selectorId).append(content);	
+					}
+				});																	
+			}					
+			var framework = new ConceptualFramework();				
+			// RESORUCE TYPE
 			framework.addAvailableConcept("resourceType","dataset","Dataset", "Dataset or subset");
 			framework.addAvailableConcept("resourceType","record","Single Record", "Single record");
-			
-
-			framework.setup("useCase","selected_use_case","selected_use_case_description");						
+			// USE CASE
 			framework.addAvailableConcept("useCase","sdm","Species Distribution Modelling", "Species distribution modeling uses, encopassing niche modeling and ...");
 			framework.addAvailableConcept("useCase","sc","Brazillian National Checklist of Species", "Official species checklist of Brazil");
-			framework.printAvailableConcept("useCase");
-
-			framework.setup("ie","selected_ie","selected_ie_description","ie_add","itens_ie");
+			// INFORMATION ELEMENT
 			framework.addAvailableConcept("ie","coord","Coordinates","Latitude, Longitude, Geodetic Datum and Coordinates Uncertainty in Meters");
 			framework.addAvailableConcept("ie","sciName","Scientific Name", "Complete scientific name");
 			framework.addAvailableConcept("ie","date","Event Date", "Date and time whether event occur");
 			framework.addAvailableConcept("ie","country","Country", "Country name and country code where the event occur");
+			// FUNDAMENTAL DIMENSIONS
+			framework.addAvailableConcept("dimension","completeness","Completeness", "<strong>Definition</strong>: Measure the extent to which every meaningful and necessary data are present and sufficient for use in a specific Use Case.<br><strong>Guideline</strong>: Is all the requisite information available? Are relevant data values missing, or in an unusable state, such as \"NULL\" or \"UNKNOWN\" or any predefined placeholders (e.g. N/A, the value 0 or -1 for numbers)? For a dataset the number or proportion of records in the database that have some specific information.");
+			framework.addAvailableConcept("dimension","resolution","Resolution", "<strong>Definition</strong>: Refer to the data have sufficient detail information. Measure the granularity of the data. Smallest measurable increment.<br><strong>Guideline</strong>: Could refer to the spatial resolution of the grids used in collecting observational records (e.g, 100m grids); the temporal resolution -  whether the data is to the day, or just the month or year; or the taxonomic resolution - whether the data is identified to species level only, or to infraspecific level.");
+			framework.addAvailableConcept("dimension","consistency","Consistency", "<strong>Definition</strong>: Agreement between different elements in the data.<br><strong>Guideline</strong>: Do distinct data instances provide conflicting information about the same underlying data object? Are values consistent across data sets? Are interdependent attributes in agreement?");
+			framework.addAvailableConcept("dimension","conformance","Conformance", "<strong>Definition</strong>: Conforms to a format, a standard, a controlled vocabulary or to the nature of the information.<br><strong>Guideline</strong>: Are there expectations that data values conform to a specified standard, format or controlled vocabulary? Should the data conform to rules related to the  nature of the data, such as limits, ranges or any other prescribed rule inherent to the real-world which the data is supposed to represent?");
+			// ENHANCEMENT TYPE
+			framework.addAvailableConcept("enhancementType","recommend","Recommendation", "Recommend error correction.");
+			framework.addAvailableConcept("enhancementType","correct","Correction", "Eliminate error.");
+
+			// SETUP
+			framework.setup("useCase","selected_use_case","selected_use_case_description");	
+			framework.setup("ie","selected_ie","selected_ie_description","ie_add","itens_ie");					
+			framework.printAvailableConcept("useCase");			
 			framework.printAvailableConcept("ie");
-
-			framework.addAvailableConcept("dimension","completeness","Completeness", "Completnes is....");
-			framework.addAvailableConcept("dimension","granularity","Granularity", "This dimension is....");
-			framework.addAvailableConcept("dimension","consistency","Consistency", "This dimension is....");
-			framework.addAvailableConcept("dimension","conformance","Conformance", "This dimension is....");
-
 			framework.setupContextualized("dimension","dimension_content","DQ Dimensions");
 			framework.setupContextualized("criterion","criterion_content", "DQ Criteria");
 			framework.setupContextualized("enhancement","enhancement_content", "DQ Enhancements");
-
-
 
 			// More info https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
@@ -455,13 +555,13 @@
 			        // will be disabled while the menu is open.
 			        keyboard: false
 			    },
-
+			    // textToSpeechURL: 'http://api.voicerss.org/?key=f4421fc0862541b2ab0e73286d31e87c&hl=en-gb&c=ogg&src=',
 				history: true,
 				audioPrefix: 'audio/',        // audio files are stored in the "audio" folder
 			    audioSuffix: '.wav',          // audio files have the ".ogg" ending
-			    audioDefaultDuration: 5, // default duration if no audio is available
+			    // audioDefaultDuration: 5, // default duration if no audio is available
 			    audioPlayerOpacity: 0.05,     // opacity value of audio player if unfocused				
-				transition: 'slide', // none/fade/slide/convex/concave/zoom
+				transition: 'concave', // none/fade/slide/convex/concave/zoom
 				// More info https://github.com/hakimel/reveal.js#dependencies
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
