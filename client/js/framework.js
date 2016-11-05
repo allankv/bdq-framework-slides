@@ -35,13 +35,13 @@ ConceptualFramework.prototype.setup = function(concept,selectorId,selectorIdDesc
 ConceptualFramework.prototype.updateProfileUseCase = function() {
 	var self = this;	
 	$("h2[name*='profile_title'").html('DQ Profile for <strong>'+self.profile.useCase.value+'</strong>');				
-	$("blockquote[name*='profile_use_case_definition'").html('<strong>'+self.profile.useCase.value+' Use Case</strong> - '+self.profile.useCase.description+'');				
+	$("div[name*='profile_use_case_definition'").html('<strong>'+self.profile.useCase.value+' Use Case</strong> - '+self.profile.useCase.description+'');				
 }
 ConceptualFramework.prototype.updateProfileVIE = function() {
 	var self = this;								
 	$('#vie_content').html('');
 	Object.keys(self.profile.ie).forEach(function(key) {
-		$('#vie_content').append('<blockquote style="width:90%;margin:5px auto"><strong>'+self.profile.ie[key].value+'</strong> - '+self.profile.ie[key].description+'</blockquote>');				
+		$('#vie_content').append('<div style="width:90%;"><strong>'+self.profile.ie[key].value+'</strong> - '+self.profile.ie[key].description+'</div>');				
 	});								
 }
 ConceptualFramework.prototype.updateMeasurementPolicy = function() {
@@ -49,21 +49,21 @@ ConceptualFramework.prototype.updateMeasurementPolicy = function() {
 	$('#measurement_policy_content').html('');
 	Object.keys(self.profile.measurement).forEach(function(key) {
 		console.log("LOG: ",self.profile.measurement[key].name);
-		$('#measurement_policy_content').append('<blockquote style="width:90%;margin:5px auto"><strong>'+self.profile.measurement[key].name+'</strong> - '+self.profile.measurement[key].definition+'</blockquote>');				
+		$('#measurement_policy_content').append('<div style="width:90%;"><strong>'+self.profile.measurement[key].name+'</strong> - '+self.profile.measurement[key].definition+'</div>');				
 	});								
 }
 ConceptualFramework.prototype.updateValidationPolicy = function() {
 	var self = this;								
 	$('#validation_policy_content').html('');
 	Object.keys(self.profile.validation).forEach(function(key) {
-		$('#validation_policy_content').append('<blockquote style="width:90%;margin:5px auto">'+self.profile.validation[key].criterion+'</blockquote>');				
+		$('#validation_policy_content').append('<div style="width:90%;">'+self.profile.validation[key].criterion+'</div>');				
 	});								
 }
 ConceptualFramework.prototype.updateImprovementPolicy = function() {
 	var self = this;								
 	$('#improvement_policy_content').html('');
 	Object.keys(self.profile.improvement).forEach(function(key) {
-		$('#improvement_policy_content').append('<blockquote style="width:90%;margin:5px auto">'+self.profile.improvement[key].definition+' <strong>('+self.profile.improvement[key].dimension.resourceType.value+' - '+self.profile.improvement[key].enhancementType.value+')</strong></blockquote>');				
+		$('#improvement_policy_content').append('<div style="width:90%;">'+self.profile.improvement[key].definition+' <strong>('+self.profile.improvement[key].dimension.resourceType.value+' - '+self.profile.improvement[key].enhancementType.value+')</strong></div>');				
 	});								
 }
 ConceptualFramework.prototype.updateContextualizedDimension = function() {

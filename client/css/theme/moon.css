@@ -86,10 +86,14 @@ body {
   max-width: 95%;
   max-height: 95%; }
 
-.reveal strong,
-.reveal b {
+.reveal strong {  
   color: #e7ad52;
-  font-weight: bold; }
+  font-weight: bold; 
+}
+.reveal b {
+  color: #C5D4D4;
+  font-weight: bold; 
+}
 
 .reveal em {
   font-style: italic; }
