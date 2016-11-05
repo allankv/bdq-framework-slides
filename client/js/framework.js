@@ -74,7 +74,7 @@ ConceptualFramework.prototype.updateContextualizedDimension = function() {
 	Object.keys(self.profile.ie).forEach(function(keyIE) {					
 		if($('#content_'+key+'_'+keyIE).length==0){			
 			var content = $(`<section>
-				<h3>3. Define a set of important `+self.contextulized[key].title+` for <strong>`+self.profile.ie[keyIE].value+`</strong></h3>
+				<h3 style="color: #eee8d5;">3. Define a set of important `+self.contextulized[key].title+` for <strong>`+self.profile.ie[keyIE].value+`</strong></h3>
 				<div id="content_`+key+`_`+keyIE+`"></div>
 				<blockquote id="selected_dimension_`+key+`_`+keyIE+`_description">						
 				</blockquote>
@@ -140,7 +140,7 @@ ConceptualFramework.prototype.updateContextualizedCriterion = function() {
 	$("#"+self.contextulized[key].selectorId).html('');
 	Object.keys(self.profile.ie).forEach(function(keyIE) {					
 		var content = $(`<section>
-			<h3>3. Define a set of important `+self.contextulized[key].title+` for <strong>`+self.profile.ie[keyIE].value+`</strong></h3>	
+			<h3 style="color: #eee8d5;">3. Define a set of important `+self.contextulized[key].title+` for <strong>`+self.profile.ie[keyIE].value+`</strong></h3>	
 			<div id="content_`+key+`_`+keyIE+`"></div>			
 			</section>`);					
 		Object.keys(self.profile.measurement).forEach(function(id) {						
@@ -190,7 +190,7 @@ ConceptualFramework.prototype.updateContextualizedEnhancement = function() {
 		var keyIE = self.profile.measurement[keyDimension].ie.id;				
 		if($('#content_'+key+'_'+keyIE+'_'+keyDimension).length==0){							
 			var content = $(`<section>
-				<h3>3. Define a set of important `+self.contextulized[key].title+` to improve <strong>`+self.profile.measurement[keyDimension].dimension.value+`</strong> of <strong>`+self.profile.ie[keyIE].value+`</strong> of <strong>`+self.profile.measurement[keyDimension].resourceType.value+`</strong></h3>	
+				<h3 style="color: #eee8d5;">3. Define a set of important `+self.contextulized[key].title+` to improve <strong>`+self.profile.measurement[keyDimension].dimension.value+`</strong> of <strong>`+self.profile.ie[keyIE].value+`</strong> of <strong>`+self.profile.measurement[keyDimension].resourceType.value+`</strong></h3>	
 				<small>`+self.profile.measurement[keyDimension].definition+`</small>
 				<div id="content_enhancement_`+keyIE+'_'+keyDimension+`"></div>				
 				<blockquote id="`+key+`_`+keyIE+`_`+keyDimension+`_list">
